@@ -55,7 +55,7 @@ class UserModelTest(TestCase):
         self.assertEqual(self.user.name, "andrzej")
 
     def test_user_email(self):
-        self.assertEqual(self.user.email, "andrzej@example.com")
+        self.assertEqual(self.user.email, "andrzej@example.pl")
 
     def test_user_password(self):
         self.assertEqual(self.user.password, "password")
