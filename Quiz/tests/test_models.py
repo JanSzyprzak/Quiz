@@ -34,6 +34,9 @@ class QuizModelTest(TestCase):
         self.user = User.objects.create(name="andrzej", email="andrzej@example.pl", password="password")
         self.quiz = Quiz.objects.create(category=self.category, difficulty="easy", result=5, completed=False)
 
+        self.question_1 = Question.objects.create(text="What is the capital of Poland?", answer="Warsaw", category=self.category, points=1)
+        self.question_2 = Question.objects.create(text="What is the capital of Germany?", answer="Berlin", category=self.category, points=1)
+
     def test_quiz_category(self):
         self.assertEqual(str(self.quiz.category), "Geography")
 
@@ -45,6 +48,21 @@ class QuizModelTest(TestCase):
 
     def test_quiz_completed(self):
         self.assertFalse(self.quiz.completed)
+
+    def test_quiz_questions(self):
+        self.assertEqual(self.quiz.questions.count(), 0)
+
+        # Add a question to the quiz
+        self.quiz.questions.add(self.question_1)
+        self.assertEqual(self.quiz.questions.count(), 1)
+
+        # Add another question to the quiz
+        self.quiz.questions.add(self.question_2)
+        self.assertEqual(self.quiz.questions.count(), 2)
+
+        # Remove a question from the quiz
+        self.quiz.questions.remove(self.question_1)
+        self.assertEqual(self.quiz.questions.count(), 1)
 
 
 class UserModelTest(TestCase):
