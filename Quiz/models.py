@@ -29,6 +29,7 @@ class Quiz(models.Model):
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES)
     result = models.IntegerField()
     completed = models.BooleanField(default=False)
+    questions = models.ManyToManyField(Question)
 
     def __str__(self):
         return f"{self.category} - {self.difficulty} - {self.result}"
