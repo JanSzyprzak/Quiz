@@ -1,26 +1,29 @@
 {% extends 'Quiz/main.html' %}
 
-
 {% block title %}Trivia Data{% endblock %}
 
 {% block content %}
     {% if data %}
         <h1>Trivia Data</h1>
-        <ul>
-        {% for question in data.results %}
-            <li>
-                <strong>Category:</strong> {{ question.category }}<br>
-                <strong>Question:</strong> {{ question.question|safe }}<br>
-                <strong>Difficulty:</strong> {{ question.difficulty }}<br>
-                <strong>Answers:</strong>
-                <ul>
-                {% for answer in question.mixed_answers %}
-                    <li>{{ answer|safe }}</li>
-                {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-        </ul>
+        <form method="post" action="{% url 'Quiz:submit_answers' %}">
+            {% csrf_token %}
+            {% for question in data.results %}
+                <fieldset>
+                    <legend>
+                        <strong>Category:</strong> {{ question.category }}<br>  
+                        <strong>Difficulty:</strong> {{ question.difficulty }}<br>
+                        <strong>Question:</strong> {{ question.question|safe }}<br>
+                    </legend>
+                    {% for answer in question.mixed_answers %}
+                        <div>
+                            <input type="radio" name="question_{{ forloop.parentloop.counter }}" id="answer_{{ forloop.counter }}" value="{{ answer|safe }}">
+                            <label for="answer_{{ forloop.counter }}">{{ answer|safe }}</label>
+                        </div>
+                    {% endfor %}
+                </fieldset>
+            {% endfor %}
+            <button type="submit">Submit</button>
+        </form>
     {% else %}
         <h1>Error fetching trivia data</h1>
     {% endif %}
