@@ -1,0 +1,27 @@
+{% extends 'Quiz/main.html' %}
+
+
+{% block title %}Trivia Data{% endblock %}
+
+{% block content %}
+    {% if data %}
+        <h1>Trivia Data</h1>
+        <ul>
+        {% for question in data.results %}
+            <li>
+                <strong>Category:</strong> {{ question.category }}<br>
+                <strong>Question:</strong> {{ question.question|safe }}<br>
+                <strong>Difficulty:</strong> {{ question.difficulty }}<br>
+                <strong>Answers:</strong>
+                <ul>
+                {% for answer in question.mixed_answers %}
+                    <li>{{ answer|safe }}</li>
+                {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <h1>Error fetching trivia data</h1>
+    {% endif %}
+{% endblock %}
