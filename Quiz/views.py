@@ -1,14 +1,18 @@
 import requests
 import random
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.models import Session
-
+from django.contrib.auth import login
+from . models import LeaderboardEntry
+from . forms import RegistrationForm
 
 
 # Create your views here.
 
 
 
+@login_required
 def fetch_data(request):
     url = 'https://opentdb.com/api.php?amount=10'
     response = requests.get(url)
@@ -28,7 +32,7 @@ def fetch_data(request):
     else:
         return render(request, 'Quiz/data.html', {'data': None})
     
-
+@login_required
 def submit_answers(request):
     if request.method == 'POST':
         points = 0
@@ -54,11 +58,28 @@ def submit_answers(request):
     else:
         return redirect('Quiz:fetch_data')
     
-
+@login_required
 def result(request):
-    points = request.session.get('points', None)
-    if points is not None:
-        del request.session['points']
-        return render(request, 'Quiz/result.html', {'points': points})
+    if 'points' not in request.session:
+        return redirect('Quiz:quiz')
+
+    points = request.session['points']
+    del request.session['points']
+
+    leaderboard = LeaderboardEntry.objects.all()[:10]
+
+    return render(request, 'Quiz/result.html', {'points': points, 'leaderboard': leaderboard})
+
+
+
+
+def register(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('Quiz:quiz')
     else:
-        return redirect('Quiz:fetch_data')
+        form = RegistrationForm()
+    return render(request, 'Quiz/register.html', {'form': form})
