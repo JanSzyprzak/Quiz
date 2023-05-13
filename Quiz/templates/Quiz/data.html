@@ -5,24 +5,24 @@
 {% block content %}
     {% if data %}
         <h1>Trivia Data</h1>
+        <h2>
+            <strong>Category:</strong> {{ data.results.0.category }}<br>
+            <strong>Difficulty:</strong> {{ data.results.0.difficulty }}
+        </h2>
         <form method="post" action="{% url 'Quiz:submit_answers' %}">
+            <ul>    
             {% csrf_token %}
             {% for question in data.results %}
-                <fieldset>
-                    <legend>
-                        <strong>Category:</strong> {{ question.category }}<br>  
-                        <strong>Difficulty:</strong> {{ question.difficulty }}<br>
-                        <strong>Question:</strong> {{ question.question|safe }}<br>
-                    </legend>
+                <li>
+                    <strong>Question:</strong> {{ question.question|safe }}<br>
                     {% for answer in question.mixed_answers %}
-                        <div>
-                            <input type="radio" name="question_{{ forloop.parentloop.counter }}" id="answer_{{ forloop.counter }}" value="{{ answer|safe }}">
-                            <label for="answer_{{ forloop.counter }}">{{ answer|safe }}</label>
-                        </div>
+                        <input type="radio" name="question_{{ forloop.parentloop.counter }}" value="{{ answer|escape }}" id="answer_{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
+                        <label for="answer_{{ forloop.parentloop.counter }}_{{ forloop.counter }}">{{ answer|safe }}</label><br>
                     {% endfor %}
-                </fieldset>
+                </li>
             {% endfor %}
-            <button type="submit">Submit</button>
+            </ul>
+        <button type="submit">Submit</button>
         </form>
     {% else %}
         <h1>Error fetching trivia data</h1>
