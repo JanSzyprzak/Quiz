@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.models import Session
 from django.contrib.auth import login
+from django.views.decorators.csrf import csrf_exempt
 from . models import LeaderboardEntry
 from . forms import RegistrationForm
 from .forms import QuizConfigForm
@@ -35,10 +36,25 @@ def fetch_data(request):
     del request.session['quiz_config']
     url = generate_api_url(quiz_config)
     response = requests.get(url)
-    data = response.json()
+    if response.status_code == 200:
+        data = response.json()
 
-    return render(request, 'Quiz/data.html', {'data': data})
+        for question in data['results']:
+            answers = question['incorrect_answers']
+            answers.append(question['correct_answer'])
+            random.shuffle(answers)
+            question['mixed_answers'] = answers
+
+        request.session['questions'] = data['results']
+
+        return render(request, 'Quiz/data.html', {'data': data})
+    else:
+        return render(request, 'Quiz/data.html', {'data': None})
     
+
+
+
+@csrf_exempt    
 @login_required
 def submit_answers(request):
     if request.method == 'POST':
