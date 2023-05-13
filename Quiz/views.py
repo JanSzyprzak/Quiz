@@ -18,9 +18,9 @@ def generate_api_url(session_data):
 
     if category:
         base_url += f'&category={category}'
-    elif difficulty:
+    if difficulty:
         base_url += f'&difficulty={difficulty}'
-    elif question_type:
+    if question_type:
         base_url += f'&type={question_type}'
 
     return base_url
