@@ -6,7 +6,7 @@ from django.contrib.sessions.models import Session
 from django.contrib.auth import login
 from . models import LeaderboardEntry
 from . forms import RegistrationForm
-
+from .forms import QuizConfigForm
 
 # Create your views here.
 
@@ -58,6 +58,7 @@ def submit_answers(request):
     else:
         return redirect('Quiz:fetch_data')
     
+
 @login_required
 def result(request):
     if 'points' not in request.session:
@@ -66,9 +67,13 @@ def result(request):
     points = request.session['points']
     del request.session['points']
 
+    new_entry = LeaderboardEntry(user_name=request.user, score=points)
+    new_entry.save()
+
     leaderboard = LeaderboardEntry.objects.all()[:10]
 
     return render(request, 'Quiz/result.html', {'points': points, 'leaderboard': leaderboard})
+
 
 
 
@@ -83,3 +88,24 @@ def register(request):
     else:
         form = RegistrationForm()
     return render(request, 'Quiz/register.html', {'form': form})
+
+
+@login_required
+def quiz_config(request):
+    if request.method == 'POST':
+        form = QuizConfigForm(request.POST)
+        if form.is_valid():
+            category = form.cleaned_data['category']
+            difficulty = form.cleaned_data['difficulty']
+            question_type = form.cleaned_data['question_type']
+
+            request.session['quiz_config'] = {
+                'category': category,
+                'difficulty': difficulty,
+                'question_type': question_type,
+            }
+            return redirect('Quiz:quiz')
+    else:
+        form = QuizConfigForm()
+
+    return render(request, 'Quiz/quiz_config.html', {'form': form})
