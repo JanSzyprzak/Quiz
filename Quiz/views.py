@@ -18,9 +18,9 @@ def generate_api_url(session_data):
 
     if category:
         base_url += f'&category={category}'
-    if difficulty:
+    elif difficulty:
         base_url += f'&difficulty={difficulty}'
-    if question_type:
+    elif question_type:
         base_url += f'&type={question_type}'
 
     return base_url
@@ -28,23 +28,15 @@ def generate_api_url(session_data):
 
 @login_required
 def fetch_data(request):
-    url = 'https://opentdb.com/api.php?amount=10'
+    if 'quiz_config' not in request.session:
+        return redirect('Quiz:quiz_config')
+
+    quiz_config = request.session['quiz_config']
+    url = generate_api_url(quiz_config)
     response = requests.get(url)
+    data = response.json()
 
-    if response.status_code == 200:
-        data = response.json()
-
-        for question in data['results']:
-            answers = question['incorrect_answers']
-            answers.append(question['correct_answer'])
-            random.shuffle(answers)
-            question['mixed_answers'] = answers
-
-        request.session['questions'] = data['results']
-
-        return render(request, 'Quiz/data.html', {'data': data})
-    else:
-        return render(request, 'Quiz/data.html', {'data': None})
+    return render(request, 'Quiz/data.html', {'data': data})
     
 @login_required
 def submit_answers(request):
