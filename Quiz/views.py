@@ -32,6 +32,7 @@ def fetch_data(request):
         return redirect('Quiz:quiz_config')
 
     quiz_config = request.session['quiz_config']
+    del request.session['quiz_config']
     url = generate_api_url(quiz_config)
     response = requests.get(url)
     data = response.json()
@@ -79,9 +80,6 @@ def result(request):
     leaderboard = LeaderboardEntry.objects.all()[:10]
 
     return render(request, 'Quiz/result.html', {'points': points, 'leaderboard': leaderboard})
-
-
-
 
 
 def register(request):
