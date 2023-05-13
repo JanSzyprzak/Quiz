@@ -10,6 +10,20 @@ from .forms import QuizConfigForm
 
 # Create your views here.
 
+def generate_api_url(session_data):
+    base_url = 'https://opentdb.com/api.php?amount=10'
+    category = session_data.get('category')
+    difficulty = session_data.get('difficulty')
+    question_type = session_data.get('question_type')
+
+    if category:
+        base_url += f'&category={category}'
+    if difficulty:
+        base_url += f'&difficulty={difficulty}'
+    if question_type:
+        base_url += f'&type={question_type}'
+
+    return base_url
 
 
 @login_required
