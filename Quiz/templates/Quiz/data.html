@@ -3,8 +3,9 @@
 {% block title %}Trivia Data{% endblock %}
 
 {% block content %}
+    <div class="main">
     {% if data %}
-        <h1>Trivia Data</h1>
+        <h1>My Quiz:)</h1>
         <h2>
             <strong>Category:</strong> {{ data.results.0.category }}<br>
             <strong>Difficulty:</strong> {{ data.results.0.difficulty }}
@@ -27,4 +28,5 @@
     {% else %}
         <h1>Error fetching trivia data</h1>
     {% endif %}
+    </div>
 {% endblock %}
