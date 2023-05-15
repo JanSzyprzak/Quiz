@@ -39,6 +39,9 @@ def fetch_data(request):
     if response.status_code == 200:
         data = response.json()
 
+        if len(data['results']) < 10:
+            return render(request, 'Quiz/not_enough_questions.html', {'message': "Please change quiz criteria. There are not enough questions available."})
+
         for question in data['results']:
             answers = question['incorrect_answers']
             answers.append(question['correct_answer'])
